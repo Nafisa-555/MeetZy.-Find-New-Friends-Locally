@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>MeetZy — Find Your People</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* =====================================================
+   MeetZy — Luxury Dark Theme
+   Deep navy · Glassmorphism · Animated gradient orbs
+   ===================================================== */
+
+:root {
+  --primary: #FF6B35;
+  --primary-glow: rgba(255,107,53,0.35);
+  --pink: #FF3CAC;
+  --purple: #784BA0;
+  --grad: linear-gradient(135deg, #FF6B35 0%, #FF3CAC 100%);
+  --grad-soft: linear-gradient(135deg, rgba(255,107,53,.15) 0%, rgba(255,60,172,.15) 100%);
+
+  --bg: #04040F;
+  --bg2: #080818;
+  --surface: rgba(255,255,255,0.04);
+  --surface-hover: rgba(255,255,255,0.07);
+  --glass: rgba(13,13,35,0.75);
+  --glass-border: rgba(255,255,255,0.08);
+  --glass-border-hover: rgba(255,107,53,0.4);
+
+  --text: #F0EFFF;
+  --text2: #9B9BC0;
+  --text3: #5C5C80;
+
+  --nav-h: 68px;
+  --mob-nav-h: 60px;
+  --r: 16px;
+  --r2: 24px;
+}
+
+/* ── Reset ── */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  font-family:'Plus Jakarta Sans',sans-serif;
+  background:var(--bg);color:var(--text);
+  min-height:100vh;line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+h1,h2,h3,h4{font-family:'Fraunces',serif;line-height:1.2}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,107,53,.3);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:var(--primary)}
+
+/* ── Keyframes ── */
+@keyframes orb1{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(80px,-60px) scale(1.15)}66%{transform:translate(-40px,40px) scale(.9)}}
+@keyframes orb2{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(-60px,80px) scale(1.1)}66%{transform:translate(50px,-50px) scale(.95)}}
+@keyframes orb3{0%,100%{transform:translate(0,0)}50%{transform:translate(-30px,60px)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideRight{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideLeft{from{opacity:0;transform:translateX(-40px)}to{opacity:1;transform:translateX(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes ringFill{from{stroke-dashoffset:283}to{stroke-dashoffset:var(--offset)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes glowPulse{0%,100%{box-shadow:0 0 20px var(--primary-glow)}50%{box-shadow:0 0 40px var(--primary-glow),0 0 80px rgba(255,60,172,.2)}}
+@keyframes tagPop{0%{transform:scale(1)}50%{transform:scale(1.12)}100%{transform:scale(1)}}
+
+.fade-up   {animation:fadeUp .5s cubic-bezier(.16,1,.3,1) both}
+.fade-in   {animation:fadeIn .3s ease both}
+.slide-r   {animation:slideRight .4s cubic-bezier(.16,1,.3,1) both}
+.slide-l   {animation:slideLeft .4s cubic-bezier(.16,1,.3,1) both}
+.float-anim{animation:float 4s ease-in-out infinite}
+
+.s1{animation-delay:.05s}.s2{animation-delay:.10s}.s3{animation-delay:.15s}
+.s4{animation-delay:.20s}.s5{animation-delay:.25s}.s6{animation-delay:.30s}
+
+/* ── Global Background Orbs ── */
+.orb-wrap{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.18}
+.orb-1{width:600px;height:600px;background:var(--primary);top:-200px;right:-100px;animation:orb1 18s ease-in-out infinite}
+.orb-2{width:500px;height:500px;background:var(--pink);bottom:-150px;left:-100px;animation:orb2 22s ease-in-out infinite}
+.orb-3{width:350px;height:350px;background:var(--purple);top:40%;left:40%;animation:orb3 15s ease-in-out infinite}
+@media(max-width:768px){
+  .orb-1{width:300px;height:300px}
+  .orb-2{width:280px;height:280px}
+  .orb-3{width:200px;height:200px}
+}
+
+/* ── Layout ── */
+.app-shell{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column}
+.page-wrap{flex:1;padding-top:var(--nav-h)}
+@media(max-width:768px){.page-wrap{padding-top:var(--mob-nav-h);padding-bottom:76px}}
+
+/* ── Desktop Nav ── */
+.nav{
+  position:fixed;top:0;left:0;right:0;height:var(--nav-h);
+  background:rgba(4,4,15,.85);backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--glass-border);z-index:200;
+}
+.nav-inner{max-width:1100px;margin:0 auto;padding:0 28px;height:100%;display:flex;align-items:center;gap:16px}
+.nav-logo{
+  font-family:'Fraunces',serif;font-size:26px;font-weight:900;font-style:italic;
+  background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;letter-spacing:-.5px;flex-shrink:0;margin-right:8px;
+}
+.nav-links{display:flex;align-items:center;gap:2px;flex:1;justify-content:center}
+.nav-btn{
+  display:flex;align-items:center;gap:7px;padding:9px 18px;border-radius:999px;
+  font-size:13.5px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;
+  color:var(--text2);cursor:pointer;border:1px solid transparent;
+  background:transparent;transition:all .25s;white-space:nowrap;letter-spacing:.01em;
+}
+.nav-btn:hover{color:var(--text);background:var(--surface)}
+.nav-btn.active{
+  background:var(--grad);color:#fff;
+  box-shadow:0 4px 20px var(--primary-glow);
+  border-color:transparent;
+}
+.nav-btn .ni{font-size:15px}
+.nav-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.nav-chip{
+  display:flex;align-items:center;gap:8px;padding:6px 14px 6px 8px;
+  border-radius:999px;background:var(--surface);border:1px solid var(--glass-border);
+}
+.nav-chip-name{font-size:13px;color:var(--text2);font-weight:500;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ── Mobile Top Bar ── */
+.mob-top{
+  display:none;position:fixed;top:0;left:0;right:0;height:var(--mob-nav-h);
+  background:rgba(4,4,15,.9);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--glass-border);z-index:200;
+  align-items:center;justify-content:space-between;padding:0 16px;
+}
+.mob-top-logo{font-family:'Fraunces',serif;font-size:22px;font-weight:900;font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+/* ── Mobile Bottom Nav ── */
+.mob-nav{
+  display:none;position:fixed;bottom:0;left:0;right:0;
+  height:72px;background:rgba(4,4,15,.95);backdrop-filter:blur(20px);
+  border-top:1px solid var(--glass-border);z-index:200;
+  padding:0 8px;padding-bottom:env(safe-area-inset-bottom,0);
+}
+.mob-nav-inner{display:flex;align-items:center;justify-content:space-around;height:100%}
+.mob-item{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:8px 14px;border-radius:var(--r);cursor:pointer;border:none;
+  background:transparent;min-width:56px;transition:all .2s;
+  -webkit-tap-highlight-color:transparent;
+}
+.mob-item .mi{font-size:20px;line-height:1;transition:transform .2s}
+.mob-item .ml{font-size:10px;font-weight:700;color:var(--text3);font-family:'Plus Jakarta Sans',sans-serif;text-transform:uppercase;letter-spacing:.6px;transition:color .2s}
+.mob-item.active .ml{color:var(--primary)}
+.mob-item.active .mi{transform:scale(1.15)}
+.mob-item.active{background:rgba(255,107,53,.08)}
+
+@media(max-width:768px){
+  .nav{display:none}
+  .mob-nav{display:flex}
+  .mob-top{display:flex}
+}
+
+/* ── Glass Card ── */
+.glass{
+  background:var(--glass);
+  border:1px solid var(--glass-border);
+  border-radius:var(--r2);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  transition:border-color .25s,box-shadow .25s,transform .25s;
+}
+.glass:hover{border-color:rgba(255,255,255,.12)}
+.glass-glow:hover{
+  border-color:var(--glass-border-hover);
+  box-shadow:0 8px 40px rgba(255,107,53,.15),0 0 0 1px rgba(255,107,53,.1);
+  transform:translateY(-3px);
+}
+
+/* ── Buttons ── */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:12px 24px;border-radius:999px;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:700;
+  border:none;cursor:pointer;transition:all .25s;white-space:nowrap;
+  letter-spacing:.02em;-webkit-tap-highlight-color:transparent;
+}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
+
+.btn-grad{
+  background:var(--grad);color:#fff;
+  box-shadow:0 4px 20px var(--primary-glow);
+}
+.btn-grad:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 32px var(--primary-glow)}
+
+.btn-glass{
+  background:var(--surface);color:var(--text2);
+  border:1px solid var(--glass-border);
+}
+.btn-glass:hover:not(:disabled){background:var(--surface-hover);color:var(--text);border-color:rgba(255,255,255,.15)}
+
+.btn-outline{
+  background:transparent;color:var(--primary);
+  border:1.5px solid rgba(255,107,53,.4);
+}
+.btn-outline:hover:not(:disabled){background:rgba(255,107,53,.1);border-color:var(--primary)}
+
+.btn-danger{
+  background:rgba(239,68,68,.1);color:#f87171;
+  border:1.5px solid rgba(239,68,68,.2);
+}
+.btn-danger:hover:not(:disabled){background:rgba(239,68,68,.18)}
+
+.btn-sm{padding:8px 18px;font-size:13px}
+.btn-full{width:100%}
+
+/* ── Spinner ── */
+.spinner{width:22px;height:22px;border:2px solid rgba(255,255,255,.15);border-top-color:var(--primary);border-radius:50%;animation:spin .65s linear infinite}
+.spinner-sm{width:15px;height:15px;border-width:2px}
+
+/* ── Avatar ── */
+.ava{
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-weight:800;color:#fff;flex-shrink:0;position:relative;font-family:'Plus Jakarta Sans',sans-serif;
+}
+.ava-sm {width:36px;height:36px;font-size:13px}
+.ava-md {width:48px;height:48px;font-size:17px}
+.ava-lg {width:68px;height:68px;font-size:24px}
+.ava-xl {width:90px;height:90px;font-size:30px}
+.ava-ring::before{
+  content:'';position:absolute;inset:-3px;border-radius:50%;
+  background:var(--grad);z-index:-1;animation:glowPulse 3s ease-in-out infinite;
+}
+
+/* ── Inputs ── */
+.lbl{display:block;font-size:12.5px;font-weight:700;color:var(--text2);margin-bottom:7px;text-transform:uppercase;letter-spacing:.06em}
+.inp{
+  width:100%;padding:13px 16px;
+  background:rgba(255,255,255,.05);
+  border:1.5px solid var(--glass-border);
+  border-radius:var(--r);font-size:15px;
+  font-family:'Plus Jakarta Sans',sans-serif;
+  color:var(--text);outline:none;
+  transition:border-color .2s,box-shadow .2s,background .2s;
+}
+.inp::placeholder{color:var(--text3)}
+.inp:focus{
+  border-color:var(--primary);
+  background:rgba(255,107,53,.06);
+  box-shadow:0 0 0 4px rgba(255,107,53,.12);
+}
+textarea.inp{resize:vertical;min-height:88px}
+
+/* ── Alerts ── */
+.alert{padding:12px 16px;border-radius:var(--r);font-size:13.5px;display:flex;align-items:flex-start;gap:8px;font-weight:500}
+.alert-err{background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.2)}
+.alert-ok {background:rgba(34,197,94,.1);color:#4ade80;border:1px solid rgba(34,197,94,.2)}
+
+/* ── Interest Tags ── */
+.tag{
+  display:inline-flex;align-items:center;gap:4px;padding:5px 14px;
+  border-radius:999px;font-size:12.5px;font-weight:700;
+  border:1.5px solid rgba(255,107,53,.25);
+  background:rgba(255,107,53,.1);color:var(--primary);
+  white-space:nowrap;letter-spacing:.01em;
+}
+.tag-sel{
+  cursor:pointer;background:rgba(255,255,255,.04);
+  color:var(--text2);border-color:var(--glass-border);
+  transition:all .2s;
+}
+.tag-sel:hover{background:rgba(255,107,53,.08);color:var(--primary);border-color:rgba(255,107,53,.3)}
+.tag-sel.on{
+  background:var(--grad);color:#fff;border-color:transparent;
+  box-shadow:0 2px 12px var(--primary-glow);
+  animation:tagPop .2s ease;
+}
+
+/* ── Page layout ── */
+.pg{max-width:960px;margin:0 auto;padding:32px 20px;display:flex;flex-direction:column;gap:24px}
+@media(max-width:768px){.pg{padding:20px 12px;gap:16px}}
+.pg-head h1{font-size:32px;font-weight:900;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.pg-head p{font-size:14px;color:var(--text2);margin-top:4px}
+@media(max-width:480px){.pg-head h1{font-size:24px}.pg-head p{font-size:13px}}
+
+/* ── Loading screen ── */
+.load-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px}
+.load-screen p{font-size:14px;color:var(--text2)}
+.load-dots::after{content:'...';animation:pulse 1.2s ease infinite}
+
+/* ── Empty States ── */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:64px 24px;text-align:center;gap:12px}
+.empty-icon{font-size:52px;animation:float 3s ease-in-out infinite}
+.empty-title{font-size:20px;font-weight:700;color:var(--text)}
+.empty-text{font-size:14px;color:var(--text2);max-width:260px;line-height:1.6}
+
+/* ───────────────────────────────────────
+   AUTH PAGE
+─────────────────────────────────────── */
+.auth-page{
+  min-height:100vh;display:flex;align-items:stretch;position:relative;overflow:hidden;
+}
+.auth-page::before{
+  content:'';position:fixed;inset:0;z-index:0;
+  background:
+    linear-gradient(135deg,rgba(255,107,53,.6) 0%,rgba(20,5,30,.85) 100%),
+    url('/static/friends.jpg') center/cover no-repeat;
+}
+.auth-card{
+  position:relative;z-index:1;margin-left:auto;width:440px;min-height:100vh;
+  background:rgba(4,4,15,.92);backdrop-filter:blur(24px);
+  border-left:1px solid var(--glass-border);
+  padding:60px 44px 44px;display:flex;flex-direction:column;justify-content:center;
+  animation:slideRight .5s cubic-bezier(.16,1,.3,1);
+}
+@media(max-width:640px){
+  .auth-card{width:100%;border-left:none;padding:0;background:transparent;justify-content:flex-end}
+  .auth-page::before{background:linear-gradient(to bottom,rgba(255,107,53,.65) 0%,rgba(4,4,15,1) 55%),url('/static/friends.jpg') top/cover no-repeat}
+  .auth-inner-wrap{background:rgba(4,4,15,.96);border-radius:28px 28px 0 0;padding:32px 24px 44px;border-top:1px solid var(--glass-border);backdrop-filter:blur(24px)}
+}
+.auth-logo-row{margin-bottom:6px}
+.auth-logo-txt{font-family:'Fraunces',serif;font-size:30px;font-weight:900;font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.auth-tagline{font-size:14px;color:var(--text2);margin-bottom:32px;line-height:1.6}
+.auth-heading{font-size:28px;font-weight:900;color:var(--text);margin-bottom:4px}
+.auth-sub{font-size:14px;color:var(--text2);margin-bottom:24px}
+@media(max-width:380px){
+  .auth-logo-txt{font-size:24px}
+  .auth-heading{font-size:22px}
+  .auth-tagline{margin-bottom:20px}
+  .auth-sub{margin-bottom:18px}
+}
+.auth-tabs{display:flex;background:rgba(255,255,255,.05);border-radius:999px;padding:4px;margin-bottom:28px;gap:0}
+.auth-tab{
+  flex:1;padding:9px;border-radius:999px;font-size:13.5px;font-weight:700;
+  font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;border:none;
+  background:transparent;color:var(--text2);transition:all .25s;
+}
+.auth-tab.active{background:var(--grad);color:#fff;box-shadow:0 2px 12px var(--primary-glow)}
+.auth-forgot{text-align:right;margin-top:6px}
+.auth-forgot span{font-size:12.5px;color:var(--primary);cursor:pointer;font-weight:600}
+.auth-forgot span:hover{text-decoration:underline}
+.auth-foot{margin-top:22px;text-align:center;font-size:13.5px;color:var(--text2)}
+.auth-foot span{color:var(--primary);font-weight:700;cursor:pointer}
+.auth-foot span:hover{text-decoration:underline}
+
+/* ───────────────────────────────────────
+   MATCH CARDS
+─────────────────────────────────────── */
+.matches-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px}
+@media(max-width:500px){.matches-grid{grid-template-columns:1fr}}
+
+.match-card{padding:22px;cursor:default}
+.mc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.mc-user{display:flex;align-items:center;gap:12px}
+.mc-name{font-size:16px;font-weight:800;color:var(--text);line-height:1.2}
+.mc-dist{font-size:12px;color:var(--text3);margin-top:3px;display:flex;align-items:center;gap:4px}
+
+/* Animated match ring */
+.ring-wrap{position:relative;width:52px;height:52px;flex-shrink:0}
+.ring-wrap svg{transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:rgba(255,255,255,.07);stroke-width:3}
+.ring-fill{fill:none;stroke:url(#ringGrad);stroke-width:3;stroke-linecap:round;stroke-dasharray:283;stroke-dashoffset:var(--offset,283);animation:ringFill 1.2s cubic-bezier(.16,1,.3,1) both;animation-delay:.3s}
+.ring-pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:var(--primary);line-height:1}
+
+.mc-bio{font-size:13px;color:var(--text2);line-height:1.55;margin-bottom:12px}
+.mc-interests-lbl{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:8px}
+.mc-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+
+/* ───────────────────────────────────────
+   FILTERS
+─────────────────────────────────────── */
+.filters-card{padding:22px 26px}
+.filters-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:16px;margin-bottom:18px}
+@media(max-width:480px){.filters-grid{grid-template-columns:1fr;gap:12px}}
+.filter-item label{display:flex;justify-content:space-between;font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text2);margin-bottom:8px}
+.fv{color:var(--primary);font-weight:900}
+input[type="range"]{width:100%;accent-color:var(--primary);cursor:pointer;height:4px}
+
+/* ───────────────────────────────────────
+   FRIENDS / TABS
+─────────────────────────────────────── */
+.ftabs{display:flex;gap:10px;flex-wrap:wrap}
+.ftab{
+  display:inline-flex;align-items:center;gap:8px;padding:10px 20px;
+  border-radius:999px;font-size:13.5px;font-weight:700;
+  font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;
+  border:1.5px solid var(--glass-border);
+  background:var(--surface);color:var(--text2);transition:all .2s;
+}
+.ftab:hover{border-color:rgba(255,107,53,.4);color:var(--primary);background:rgba(255,107,53,.06)}
+.ftab.active{background:var(--grad);color:#fff;border-color:transparent;box-shadow:0 4px 18px var(--primary-glow)}
+.tc{background:rgba(255,255,255,.15);color:inherit;font-size:11px;font-weight:800;padding:1px 8px;border-radius:999px;min-width:20px;text-align:center}
+.ftab:not(.active) .tc{background:rgba(255,255,255,.07);color:var(--text3)}
+
+.friend-card{padding:20px}
+.fc-top{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.fc-name{font-size:15.5px;font-weight:800}
+.fc-sub{font-size:12px;color:var(--text3);margin-top:2px}
+.fc-bio{font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:14px}
+
+/* request card */
+.req-card{padding:16px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.req-info{flex:1;min-width:100px}
+.req-name{font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.req-date{font-size:12px;color:var(--text3);margin-top:2px}
+.req-btns{display:flex;gap:8px;flex-shrink:0}
+@media(max-width:380px){.req-btns{width:100%;justify-content:flex-end}}
+
+/* ───────────────────────────────────────
+   CHAT
+─────────────────────────────────────── */
+.chat-wrap{max-width:960px;margin:0 auto;padding:20px;height:calc(100vh - var(--nav-h));display:flex;flex-direction:column}
+@media(max-width:768px){.chat-wrap{padding:0;height:calc(100svh - var(--mob-nav-h) - 72px)}}
+@supports not (height:100svh){@media(max-width:768px){.chat-wrap{height:calc(100vh - var(--mob-nav-h) - 72px)}}}
+.chat-box{display:flex;flex:1;border-radius:var(--r2);border:1px solid var(--glass-border);overflow:hidden;background:var(--glass);backdrop-filter:blur(16px);min-height:0}
+
+.chat-sidebar{width:270px;border-right:1px solid var(--glass-border);display:flex;flex-direction:column;flex-shrink:0;background:rgba(255,255,255,.02)}
+.chat-sb-head{padding:18px 16px 14px;border-bottom:1px solid var(--glass-border)}
+.chat-sb-head h2{font-size:18px;font-weight:900;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.chat-list{flex:1;overflow-y:auto}
+.chat-item{
+  display:flex;align-items:center;gap:10px;padding:13px 16px;cursor:pointer;
+  transition:background .15s;border-bottom:1px solid rgba(255,255,255,.04);
+}
+.chat-item:hover{background:rgba(255,255,255,.04)}
+.chat-item.active{background:rgba(255,107,53,.08);border-left:3px solid var(--primary)}
+.chat-item-name{font-size:14px;font-weight:700;color:var(--text)}
+.chat-item-bio{font-size:12px;color:var(--text3);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:160px;margin-top:2px}
+
+.chat-main{flex:1;display:flex;flex-direction:column;min-width:0}
+.chat-head{
+  display:flex;align-items:center;gap:12px;padding:14px 18px;
+  border-bottom:1px solid var(--glass-border);
+  background:rgba(255,255,255,.02);flex-shrink:0;
+}
+.chat-back{display:none;background:transparent;border:none;font-size:22px;cursor:pointer;color:var(--primary);padding:0;min-width:44px;min-height:44px;align-items:center;justify-content:center;border-radius:50%;transition:background .2s}
+.chat-back:hover{background:rgba(255,107,53,.1)}
+.chat-head-name{font-size:16px;font-weight:800}
+.chat-head-sub{font-size:12px;color:var(--text3);margin-top:1px}
+
+.chat-msgs{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:10px}
+.chat-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--text2)}
+.chat-empty-ico{font-size:44px;animation:float 3s ease-in-out infinite}
+
+.msg-row{display:flex;animation:fadeUp .25s ease both}
+.msg-row.out{justify-content:flex-end}
+.msg-row.in {justify-content:flex-start}
+.msg-bubble{max-width:70%;padding:11px 16px;border-radius:20px;font-size:14px;line-height:1.55}
+.msg-bubble.out{
+  background:var(--grad);color:#fff;border-bottom-right-radius:5px;
+  box-shadow:0 4px 16px var(--primary-glow);
+}
+.msg-bubble.in{background:rgba(255,255,255,.07);color:var(--text);border-bottom-left-radius:5px;border:1px solid var(--glass-border)}
+.msg-time{font-size:10px;opacity:.55;margin-top:4px;text-align:right}
+
+.chat-input-row{
+  padding:12px 16px;border-top:1px solid var(--glass-border);
+  display:flex;gap:10px;align-items:center;background:rgba(255,255,255,.02);flex-shrink:0;
+}
+.chat-inp{
+  flex:1;padding:11px 18px;
+  background:rgba(255,255,255,.06);border:1.5px solid var(--glass-border);
+  border-radius:999px;font-size:14px;font-family:'Plus Jakarta Sans',sans-serif;
+  color:var(--text);outline:none;transition:border-color .2s,background .2s;
+}
+.chat-inp::placeholder{color:var(--text3)}
+.chat-inp:focus{border-color:var(--primary);background:rgba(255,107,53,.06)}
+.chat-send{
+  width:42px;height:42px;border-radius:50%;border:none;
+  background:var(--grad);color:#fff;font-size:18px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;flex-shrink:0;box-shadow:0 4px 16px var(--primary-glow);
+}
+.chat-send:hover{transform:scale(1.08)}
+.chat-send:disabled{opacity:.4;transform:none;cursor:not-allowed}
+
+@media(max-width:768px){
+  .chat-box{border-radius:0;border-left:none;border-right:none}
+  .chat-sidebar{width:100%;border-right:none}
+  .chat-sidebar.hide,.chat-main.hide{display:none}
+  .chat-back{display:flex}
+  .chat-main{width:100%}
+}
+@media(min-width:769px){
+  .chat-sidebar.hide,.chat-main.hide{display:flex!important}
+}
+
+/* ───────────────────────────────────────
+   PROFILE
+─────────────────────────────────────── */
+.profile-hero{
+  padding:32px;display:flex;align-items:flex-start;gap:22px;position:relative;
+  background:linear-gradient(135deg,rgba(255,107,53,.06) 0%,rgba(255,60,172,.04) 100%);
+  border-radius:var(--r2) var(--r2) 0 0;
+  border-bottom:1px solid var(--glass-border);
+}
+@media(max-width:500px){.profile-hero{flex-direction:column;align-items:center;text-align:center;padding:24px 20px}}
+.ph-info{flex:1}
+.ph-name{font-size:28px;font-weight:900;margin-bottom:3px;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.ph-email{font-size:13.5px;color:var(--text2);margin-bottom:12px}
+.ph-stats{display:flex;gap:12px;flex-wrap:wrap}
+.ph-stat{
+  display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text2);font-weight:600;
+  padding:5px 12px;background:rgba(255,255,255,.05);border-radius:999px;border:1px solid var(--glass-border);
+}
+.ph-stat span:first-child{font-size:15px}
+.ph-edit-btn{position:absolute;top:24px;right:24px}
+@media(max-width:500px){.ph-edit-btn{position:static;align-self:stretch;width:100%;margin-top:12px}}
+
+.profile-body{padding:28px}
+@media(max-width:500px){.profile-body{padding:20px 16px}}
+.section-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:12px}
+
+.interests-card{padding:28px}
+@media(max-width:500px){.interests-card{padding:20px 16px}}
+.cat-title{font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:10px}
+.cat-sec{margin-bottom:22px}
+.tags-row{display:flex;flex-wrap:wrap;gap:8px}
+.int-counter{
+  display:inline-flex;align-items:center;gap:6px;padding:6px 14px;
+  border-radius:999px;font-size:13px;font-weight:700;
+  background:rgba(255,107,53,.1);color:var(--primary);border:1px solid rgba(255,107,53,.25);
+  margin-bottom:16px;
+}
+
+/* no interests warning */
+.no-int-box{background:rgba(255,159,28,.07);border:1.5px solid rgba(255,159,28,.2);border-radius:var(--r);padding:24px;text-align:center}
+.no-int-box h4{font-size:17px;font-weight:700;color:#fbbf24;margin-bottom:8px}
+.no-int-box p{font-size:13px;color:var(--text2);margin-bottom:12px}
+.code-blk{background:rgba(0,0,0,.5);color:#fb923c;padding:10px 14px;border-radius:var(--r);font-size:13px;font-family:monospace;margin:8px 0;text-align:left;border:1px solid rgba(255,255,255,.06)}
+
+/* ── divider ── */
+.div{height:1px;background:var(--glass-border);margin:0}
+
+/* ── utility ── */
+.mb-3{margin-bottom:12px}.mb-4{margin-bottom:16px}.mb-5{margin-bottom:20px}
+.mt-2{margin-top:8px}.mt-3{margin-top:12px}
+.flex{display:flex}.items-center{align-items:center}.gap-2{gap:8px}.gap-3{gap:12px}
+.flex-1{flex:1}.w-full{width:100%}
+.text2{color:var(--text2)}.text3{color:var(--text3)}
+</style>
+</head>
+<body>
+<div class="orb-wrap">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+const API_BASE_URL = window.location.origin;
+
+/* ─────────────────────────── API ─────────────────────────── */
+const api = {
+  parseError: async (r) => {
+    try {
+      const e = await r.json();
+      if (e.detail) return typeof e.detail==='string' ? e.detail : e.detail.map(x=>x.msg).join(', ');
+      return e.message || 'An error occurred';
+    } catch { return `Error ${r.status}: ${r.statusText}`; }
+  },
+  signup: async (d) => { const r=await fetch(`${API_BASE_URL}/api/v1/auth/signup`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)}); if(!r.ok)throw new Error(await api.parseError(r)); return r.json(); },
+  login:  async (d) => { const r=await fetch(`${API_BASE_URL}/api/v1/auth/login`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)}); if(!r.ok)throw new Error(await api.parseError(r)); return r.json(); },
+  getCurrentUser: async (t) => { const r=await fetch(`${API_BASE_URL}/api/v1/auth/me`,{headers:{Authorization:`Bearer ${t}`}}); if(!r.ok)throw new Error(await api.parseError(r)); return r.json(); },
+  getProfile: async (t) => { const r=await fetch(`${API_BASE_URL}/api/v1/users/profile`,{headers:{Authorization:`Bearer ${t}`}}); if(!r.ok)throw new Error(await api.parseError(r)); return r.json(); },
+  updateProfile: async (t,d) => { const r=await fetch(`${API_BASE_URL}/api/v1/users/profile`,{method:'PUT',headers:{Authorization:`Bearer ${t}`,'Content-Type':'application/json'},body:JSON.stringify(d)}); if(!r.ok)throw new Error(await api.parseError(r)); return r.json(); },
+  updateInterests: async (t,ids) => { const r=await fetch(`${API_BASE_URL}/api/v1/users/interests`,{method:'PUT',headers:{Authorization:`Bearer ${t}`,'Content-Type':'application/json'},body:JSON.stringify({interest_ids:ids})}); if(!r.ok)throw new Error(await api.parseError(r)); return r.json(); },
+  getAvailableInterests: async (t) => { const r=await fetch(`${API_BASE_URL}/api/v1/users/interests/available`,{headers:{Authorization:`Bearer ${t}`}}); if(!r.ok)throw new Error(await api.parseError(r)); return r.json(); },
+  updateLocation: async (t,lat,lng) => { const r=await fetch(`${API_BASE_URL}/api/v1/users/location`,{method:'PUT',headers:{Authorization:`Bearer ${t}`,'Content-Type':'application/json'},body:JSON.stringify({latitude:lat,longitude:lng})}); if(!r.ok)throw new Error(await api.parseError(r)); return r.json(); },
+  findMatches: async (t,d=50,m=30,l=20) => { const r=await fetch(`${API_BASE_URL}/api/v1/matches/find-friends?max_distance_km=${d}&min_match_percentage=${m}&limit=${l}`,{headers:{Authorization:`Bearer ${t}`}}); if(!r.ok)throw new Error(await api.parseError(r)); return r.json(); },
+  sendFriendRequest: async (t,id) => { const r=await fetch(`${API_BASE_URL}/api/v1/friends/request`,{method:'POST',headers:{Authorization:`Bearer ${t}`,'Content-Type':'application/json'},body:JSON.stringify({receiver_id:id})}); if(!r.ok)throw new Error(await api.parseError(r)); return r.json(); },
+  getPendingRequests: async (t) => { const r=await fetch(`${API_BASE_URL}/api/v1/friends/requests/pending`,{headers:{Authorization:`Bearer ${t}`}}); if(!r.ok)throw new Error(await api.parseError(r)); return r.json(); },
+  acceptFriendRequest: async (t,id) => { const r=await fetch(`${API_BASE_URL}/api/v1/friends/request/${id}/accept`,{method:'PUT',headers:{Authorization:`Bearer ${t}`}}); if(!r.ok)throw new Error(await api.parseError(r)); return r.json(); },
+  rejectFriendRequest: async (t,id) => { const r=await fetch(`${API_BASE_URL}/api/v1/friends/request/${id}/reject`,{method:'PUT',headers:{Authorization:`Bearer ${t}`}}); if(!r.ok)throw new Error(await api.parseError(r)); return r.json(); },
+  getFriendsList: async (t) => { const r=await fetch(`${API_BASE_URL}/api/v1/friends/`,{headers:{Authorization:`Bearer ${t}`}}); if(!r.ok)throw new Error(await api.parseError(r)); return r.json(); },
+  unfriend: async (t,id) => { const r=await fetch(`${API_BASE_URL}/api/v1/friends/${id}`,{method:'DELETE',headers:{Authorization:`Bearer ${t}`}}); if(!r.ok)throw new Error(await api.parseError(r)); return r; },
+  sendMessage: async (t,id,c) => { const r=await fetch(`${API_BASE_URL}/api/v1/chat/messages/${id}`,{method:'POST',headers:{Authorization:`Bearer ${t}`,'Content-Type':'application/json'},body:JSON.stringify({content:c})}); if(!r.ok)throw new Error(await api.parseError(r)); return r.json(); },
+  getConversation: async (t,id,l=50) => { const r=await fetch(`${API_BASE_URL}/api/v1/chat/messages/${id}?limit=${l}`,{headers:{Authorization:`Bearer ${t}`}}); if(!r.ok)throw new Error(await api.parseError(r)); return r.json(); },
+  markMessagesRead: async (t,ids) => { const r=await fetch(`${API_BASE_URL}/api/v1/chat/messages/read`,{method:'PUT',headers:{Authorization:`Bearer ${t}`,'Content-Type':'application/json'},body:JSON.stringify({message_ids:ids})}); if(!r.ok)throw new Error(await api.parseError(r)); return r.json(); },
+  getConversationsList: async (t) => { const r=await fetch(`${API_BASE_URL}/api/v1/chat/conversations`,{headers:{Authorization:`Bearer ${t}`}}); if(!r.ok)throw new Error(await api.parseError(r)); return r.json(); },
+  getUnreadCount: async (t) => { const r=await fetch(`${API_BASE_URL}/api/v1/chat/unread-count`,{headers:{Authorization:`Bearer ${t}`}}); if(!r.ok)throw new Error(await api.parseError(r)); return r.json(); },
+};
+
+/* ─────────────────────────── Utility Components ─────────────────────────── */
+const AVA_GRADS = [
+  'linear-gradient(135deg,#FF6B35,#FF3CAC)',
+  'linear-gradient(135deg,#06D6A0,#0094FF)',
+  'linear-gradient(135deg,#7C4DFF,#FF3CAC)',
+  'linear-gradient(135deg,#FF9800,#FF3CAC)',
+  'linear-gradient(135deg,#00BCD4,#7C4DFF)',
+];
+function Ava({ name, size='md', ring=false }) {
+  const ini = (name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  const g = AVA_GRADS[(name||'').charCodeAt(0) % AVA_GRADS.length];
+  return (
+    <div className={`ava ava-${size}${ring?' ava-ring':''}`} style={{background:g}}>{ini}</div>
+  );
+}
+
+function Spinner({ sm }) { return <div className={`spinner${sm?' spinner-sm':''}`} />; }
+function LoadScreen({ text }) {
+  return (
+    <div className="load-screen fade-in">
+      <Spinner />
+      {text && <p className="load-dots">{text}</p>}
+    </div>
+  );
+}
+
+/* Circular match ring */
+function MatchRing({ pct }) {
+  const r = 45, circ = 2 * Math.PI * r;
+  const offset = circ - (pct / 100) * circ;
+  return (
+    <div className="ring-wrap">
+      <svg width="52" height="52" viewBox="0 0 100 100">
+        <defs>
+          <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#FF6B35"/>
+            <stop offset="100%" stopColor="#FF3CAC"/>
+          </linearGradient>
+        </defs>
+        <circle className="ring-bg" cx="50" cy="50" r={r}/>
+        <circle className="ring-fill" cx="50" cy="50" r={r}
+          style={{'--offset': offset}}/>
+      </svg>
+      <div className="ring-pct">{pct}%</div>
+    </div>
+  );
+}
+
+/* ─────────────────────────── AUTH ─────────────────────────── */
+function Auth({ onLogin }) {
+  const [isLogin, setIsLogin] = useState(true);
+  const [form, setForm] = useState({ email:'', password:'', name:'' });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const submit = async (e) => {
+    e.preventDefault(); setLoading(true); setError('');
+    if (!isLogin) {
+      if (form.password.length < 8) { setError('Password must be at least 8 characters'); setLoading(false); return; }
+      if (form.name.length < 2)     { setError('Name must be at least 2 characters');     setLoading(false); return; }
+    }
+    try {
+      const res = isLogin
+        ? await api.login({ email:form.email, password:form.password })
+        : await api.signup({ email:form.email, password:form.password, name:form.name });
+      localStorage.setItem('token', res.access_token);
+      onLogin(res.access_token);
+    } catch(err) { setError(err.message); }
+    finally { setLoading(false); }
+  };
+
+  const sw = (m) => { setIsLogin(m); setError(''); setForm({email:'',password:'',name:''}); };
+
+  return (
+    <div className="auth-page">
+      <div className="auth-card">
+        <div className="auth-inner-wrap">
+          <div className="auth-logo-row">
+            <span className="auth-logo-txt">MeetZy</span>
+          </div>
+          <p className="auth-tagline">Find people who share your world 🌍</p>
+          <h2 className="auth-heading">{isLogin ? 'Welcome back' : 'Join MeetZy'}</h2>
+          <p className="auth-sub">{isLogin ? 'Login to your account' : "It's free — always will be"}</p>
+          <div className="auth-tabs">
+            <button className={`auth-tab${isLogin?' active':''}`} onClick={()=>sw(true)}>Login</button>
+            <button className={`auth-tab${!isLogin?' active':''}`} onClick={()=>sw(false)}>Sign Up</button>
+          </div>
+          {error && <div className="alert alert-err mb-4"><span>⚠</span> {error}</div>}
+          <form onSubmit={submit} style={{display:'flex',flexDirection:'column',gap:'14px'}}>
+            {!isLogin && (
+              <div>
+                <label className="lbl">Full Name</label>
+                <input className="inp" type="text" placeholder="Your full name" value={form.name}
+                  onChange={e=>setForm({...form,name:e.target.value})} required minLength={2}/>
+              </div>
+            )}
+            <div>
+              <label className="lbl">Email</label>
+              <input className="inp" type="email" placeholder="you@example.com" value={form.email}
+                onChange={e=>setForm({...form,email:e.target.value})} required/>
+            </div>
+            <div>
+              <label className="lbl">Password</label>
+              <input className="inp" type="password" placeholder="••••••••" value={form.password}
+                onChange={e=>setForm({...form,password:e.target.value})} required minLength={isLogin?undefined:8}/>
+              {isLogin && <div className="auth-forgot"><span>Forgot password?</span></div>}
+            </div>
+            <button type="submit" className="btn btn-grad btn-full" disabled={loading} style={{marginTop:'6px'}}>
+              {loading ? <Spinner sm/> : (isLogin ? 'Sign In' : 'Create Account')}
+            </button>
+          </form>
+          <p className="auth-foot">
+            {isLogin
+              ? <>Don't have an account? <span onClick={()=>sw(false)}>Sign up</span></>
+              : <>Already a member? <span onClick={()=>sw(true)}>Login</span></>}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────── FIND MATCHES ─────────────────────────── */
+function FindMatches({ token }) {
+  const [matches, setMatches] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(null);
+  const [filters, setFilters] = useState({ maxDistance:50, minMatch:30, limit:20 });
+
+  useEffect(()=>{ load(); },[]);
+
+  const load = async () => {
+    setLoading(true);
+    try { const d = await api.findMatches(token,filters.maxDistance,filters.minMatch,filters.limit); setMatches(d.matches); }
+    catch(e){ console.error(e); }
+    finally{ setLoading(false); }
+  };
+
+  const sendReq = async (id) => {
+    setSending(id);
+    try { await api.sendFriendRequest(token,id); setMatches(matches.filter(m=>m.id!==id)); }
+    catch(e){ alert(e.message); }
+    finally{ setSending(null); }
+  };
+
+  // 3D tilt effect — desktop only
+  const isTouchDevice = () => window.matchMedia('(hover: none)').matches;
+  const tilt = (e) => {
+    if(isTouchDevice()) return;
+    const card = e.currentTarget;
+    const r = card.getBoundingClientRect();
+    const x = e.clientX - r.left, y = e.clientY - r.top;
+    const cx = r.width/2, cy = r.height/2;
+    const rx = (y-cy)/cy*6, ry = (cx-x)/cx*6;
+    card.style.transform = `perspective(800px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-4px)`;
+    card.style.boxShadow = `0 20px 60px rgba(255,107,53,.2), 0 0 0 1px rgba(255,107,53,.2)`;
+  };
+  const untilt = (e) => {
+    if(isTouchDevice()) return;
+    const card = e.currentTarget;
+    card.style.transform = '';
+    card.style.boxShadow = '';
+  };
+
+  return (
+    <div className="pg fade-up">
+      <div className="pg-head">
+        <h1>Discover People</h1>
+        <p>Find friends with shared interests near you</p>
+      </div>
+
+      {/* Filters */}
+      <div className="glass filters-card fade-up s1">
+        <div style={{fontSize:'13px',fontWeight:'800',textTransform:'uppercase',letterSpacing:'.08em',color:'var(--text2)',marginBottom:'18px'}}>
+          ⚙️ Filters
+        </div>
+        <div className="filters-grid">
+          {[
+            {label:'Max Distance',val:`${filters.maxDistance} km`,key:'maxDistance',min:1,max:200},
+            {label:'Min Match',   val:`${filters.minMatch}%`,     key:'minMatch',   min:0,max:100},
+            {label:'Results',    val:filters.limit,               key:'limit',      min:5,max:50},
+          ].map(f=>(
+            <div className="filter-item" key={f.key}>
+              <label>{f.label}<span className="fv">{f.val}</span></label>
+              <input type="range" min={f.min} max={f.max} value={filters[f.key]}
+                onChange={e=>setFilters({...filters,[f.key]:+e.target.value})}/>
+            </div>
+          ))}
+        </div>
+        <button className="btn btn-grad btn-sm" onClick={load} disabled={loading}>
+          {loading ? <><Spinner sm/> Searching…</> : '✦ Find Matches'}
+        </button>
+      </div>
+
+      {loading ? <LoadScreen text="Finding your matches"/> :
+       matches.length===0 ? (
+         <div className="glass" style={{borderRadius:'var(--r2)'}}>
+           <div className="empty"><div className="empty-icon">🔍</div>
+             <div className="empty-title">No matches found</div>
+             <p className="empty-text">Try wider filters or add more interests to your profile.</p>
+           </div>
+         </div>
+       ) : (
+        <div className="matches-grid">
+          {matches.map((m,i)=>(
+            <div key={m.id} className={`glass glass-glow match-card fade-up s${Math.min(i+1,6)}`}
+              onMouseMove={tilt} onMouseLeave={untilt}
+              style={{transition:'transform .15s ease,box-shadow .15s ease,border-color .25s'}}>
+              <div className="mc-top">
+                <div className="mc-user">
+                  <Ava name={m.name} size="md"/>
+                  <div>
+                    <div className="mc-name">{m.name}</div>
+                    {m.distance_km && <div className="mc-dist">📍 {m.distance_km.toFixed(1)} km away</div>}
+                  </div>
+                </div>
+                <MatchRing pct={m.match_percentage}/>
+              </div>
+              {m.bio && <p className="mc-bio">{m.bio}</p>}
+              {m.common_interests?.length > 0 && (
+                <div>
+                  <div className="mc-interests-lbl">Common Interests</div>
+                  <div className="mc-tags">
+                    {m.common_interests.slice(0,5).map((t,idx)=>(
+                      <span key={idx} className="tag" style={{fontSize:'11.5px',padding:'4px 11px'}}>{t}</span>
+                    ))}
+                    {m.common_interests.length>5 && <span style={{fontSize:'12px',color:'var(--text3)',alignSelf:'center'}}>+{m.common_interests.length-5}</span>}
+                  </div>
+                </div>
+              )}
+              <button className="btn btn-grad btn-full btn-sm" disabled={sending===m.id} onClick={()=>sendReq(m.id)}>
+                {sending===m.id ? <><Spinner sm/> Sending…</> : '+ Connect'}
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─────────────────────────── FRIENDS ─────────────────────────── */
+function Friends({ token }) {
+  const [friends, setFriends] = useState([]);
+  const [pending, setPending] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [tab, setTab] = useState('friends');
+
+  useEffect(()=>{ loadAll(); },[]);
+  const loadAll = async () => {
+    try {
+      const [f,p] = await Promise.all([api.getFriendsList(token), api.getPendingRequests(token)]);
+      setFriends(f.friends); setPending(p);
+    } catch(e){ console.error(e); }
+    finally { setLoading(false); }
+  };
+
+  const accept = async (id) => { try { await api.acceptFriendRequest(token,id); loadAll(); } catch(e){ alert(e.message); } };
+  const reject = async (id) => { try { await api.rejectFriendRequest(token,id); loadAll(); } catch(e){ alert(e.message); } };
+  const unfriend = async (id) => { if(!confirm('Unfriend this person?')) return; try { await api.unfriend(token,id); loadAll(); } catch(e){ alert(e.message); } };
+
+  if(loading) return <LoadScreen text="Loading friends"/>;
+
+  return (
+    <div className="pg fade-up">
+      <div className="pg-head">
+        <h1>Friends</h1>
+        <p>Manage your connections</p>
+      </div>
+
+      <div className="ftabs">
+        <button className={`ftab${tab==='friends'?' active':''}`} onClick={()=>setTab('friends')}>
+          👥 My Friends <span className="tc">{friends.length}</span>
+        </button>
+        <button className={`ftab${tab==='requests'?' active':''}`} onClick={()=>setTab('requests')}>
+          🔔 Requests <span className="tc">{pending.length}</span>
+        </button>
+      </div>
+
+      {tab==='friends' ? (
+        friends.length===0 ? (
+          <div className="glass" style={{borderRadius:'var(--r2)'}}>
+            <div className="empty"><div className="empty-icon">👥</div>
+              <div className="empty-title">No friends yet</div>
+              <p className="empty-text">Go to Discover and send some friend requests!</p>
+            </div>
+          </div>
+        ) : (
+          <div className="matches-grid">
+            {friends.map((f,i)=>(
+              <div key={f.id} className={`glass glass-glow friend-card fade-up s${Math.min(i+1,6)}`}>
+                <div className="fc-top">
+                  <Ava name={f.name} size="md"/>
+                  <div>
+                    <div className="fc-name">{f.name}</div>
+                    {f.common_interests_count>0 && <div className="fc-sub">✨ {f.common_interests_count} common interests</div>}
+                  </div>
+                </div>
+                {f.bio && <p className="fc-bio">{f.bio}</p>}
+                <button className="btn btn-danger btn-sm btn-full" onClick={()=>unfriend(f.id)}>Unfriend</button>
+              </div>
+            ))}
+          </div>
+        )
+      ) : (
+        pending.length===0 ? (
+          <div className="glass" style={{borderRadius:'var(--r2)'}}>
+            <div className="empty"><div className="empty-icon">🔔</div>
+              <div className="empty-title">All caught up!</div>
+              <p className="empty-text">No pending friend requests.</p>
+            </div>
+          </div>
+        ) : (
+          <div style={{display:'flex',flexDirection:'column',gap:'10px'}}>
+            {pending.map((req,i)=>(
+              <div key={req.id} className={`glass req-card fade-up s${Math.min(i+1,6)}`}>
+                <Ava name={req.sender_name} size="md"/>
+                <div className="req-info">
+                  <div className="req-name">{req.sender_name}</div>
+                  <div className="req-date">{new Date(req.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}</div>
+                </div>
+                <div className="req-btns">
+                  <button className="btn btn-grad btn-sm" onClick={()=>accept(req.id)}>✓ Accept</button>
+                  <button className="btn btn-glass btn-sm" onClick={()=>reject(req.id)}>✕</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )
+      )}
+    </div>
+  );
+}
+
+/* ─────────────────────────── CHAT ─────────────────────────── */
+function Chat({ token, currentUserId }) {
+  const [friends, setFriends] = useState([]);
+  const [selected, setSelected] = useState(null);
+  const [msgs, setMsgs] = useState([]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [showChat, setShowChat] = useState(false);
+  const endRef = useRef(null);
+  const inputRef = useRef(null);
+  const isMob = () => window.innerWidth <= 768;
+
+  useEffect(()=>{ loadFriends(); },[]);
+  useEffect(()=>{ if(selected){ loadConv(selected.id); if(isMob()) setShowChat(true); } },[selected]);
+  useEffect(()=>{ endRef.current?.scrollIntoView({behavior:'smooth'}); },[msgs]);
+
+  const loadFriends = async () => { try { const d=await api.getFriendsList(token); setFriends(d.friends); } catch(e){console.error(e);} finally{setLoading(false);} };
+  const loadConv   = async (id) => { try { const d=await api.getConversation(token,id); setMsgs(d.messages); } catch(e){console.error(e);} };
+
+  const send = async (e) => {
+    e.preventDefault();
+    if(!input.trim()||!selected) return;
+    const c=input; setInput('');
+    try { const m=await api.sendMessage(token,selected.id,c); setMsgs(p=>[...p,m]); }
+    catch(err){ alert(err.message); setInput(c); }
+  };
+
+  const back = () => { setShowChat(false); setSelected(null); };
+  if(loading) return <LoadScreen text="Loading messages"/>;
+
+  const sbVis = !isMob()||!showChat;
+  const cvVis = !isMob()||showChat;
+
+  return (
+    <div className="chat-wrap">
+      <div className="chat-box">
+        {/* Sidebar */}
+        <div className={`chat-sidebar${sbVis?'':' hide'}`}>
+          <div className="chat-sb-head"><h2>Messages</h2></div>
+          <div className="chat-list">
+            {friends.length===0
+              ? <div style={{padding:'28px 16px',textAlign:'center',color:'var(--text3)',fontSize:'13px'}}>No friends to chat with yet</div>
+              : friends.map(f=>(
+                  <div key={f.id} className={`chat-item${selected?.id===f.id?' active':''}`} onClick={()=>setSelected(f)}>
+                    <Ava name={f.name} size="sm"/>
+                    <div style={{minWidth:0}}>
+                      <div className="chat-item-name">{f.name}</div>
+                      {f.bio && <div className="chat-item-bio">{f.bio}</div>}
+                    </div>
+                  </div>
+                ))}
+          </div>
+        </div>
+
+        {/* Chat area */}
+        <div className={`chat-main${cvVis?'':' hide'}`}>
+          {selected ? (
+            <>
+              <div className="chat-head">
+                <button className="chat-back" onClick={back}>←</button>
+                <Ava name={selected.name} size="sm"/>
+                <div>
+                  <div className="chat-head-name">{selected.name}</div>
+                  {selected.bio && <div className="chat-head-sub">{selected.bio}</div>}
+                </div>
+              </div>
+              <div className="chat-msgs">
+                {msgs.length===0
+                  ? <div className="chat-empty"><div className="chat-empty-ico">💬</div><div style={{fontSize:'14px',color:'var(--text2)'}}>No messages yet. Say hi!</div></div>
+                  : msgs.map(m=>(
+                      <div key={m.id} className={`msg-row ${m.sender_id===currentUserId?'out':'in'}`}>
+                        <div className={`msg-bubble ${m.sender_id===currentUserId?'out':'in'}`}>
+                          <p>{m.content}</p>
+                          <p className="msg-time">{new Date(m.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</p>
+                        </div>
+                      </div>
+                    ))}
+                <div ref={endRef}/>
+              </div>
+              <form onSubmit={send} className="chat-input-row">
+                <input ref={inputRef} className="chat-inp" type="text" placeholder="Type a message…"
+                  value={input} onChange={e=>setInput(e.target.value)}/>
+                <button type="submit" className="chat-send" disabled={!input.trim()}>➤</button>
+              </form>
+            </>
+          ) : (
+            <div className="chat-empty" style={{flex:1,display:'flex'}}>
+              <div className="chat-empty-ico">💬</div>
+              <div style={{fontSize:'14px',color:'var(--text2)'}}>Select a friend to start chatting</div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────── PROFILE ─────────────────────────── */
+function Profile({ token, user }) {
+  const [profile, setProfile] = useState(null);
+  const [avail, setAvail] = useState({});
+  const [sel, setSel] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadingInt, setLoadingInt] = useState(true);
+  const [intErr, setIntErr] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [savingP, setSavingP] = useState(false);
+  const [savingI, setSavingI] = useState(false);
+  const [msgP, setMsgP] = useState(null);
+  const [msgI, setMsgI] = useState(null);
+  const [form, setForm] = useState({name:'',bio:'',latitude:'',longitude:''});
+
+  useEffect(()=>{ loadProfile(); loadInterests(); },[]);
+
+  const loadProfile = async () => {
+    try { const d=await api.getProfile(token); setProfile(d); setForm({name:d.name||'',bio:d.bio||'',latitude:d.latitude||'',longitude:d.longitude||''}); setSel(d.interests.map(i=>i.id)); }
+    catch(e){ setMsgP({t:'err',s:'Failed to load: '+e.message}); }
+    finally{ setLoading(false); }
+  };
+  const loadInterests = async () => {
+    setLoadingInt(true); setIntErr(false);
+    try { const d=await api.getAvailableInterests(token); if(!d||Object.keys(d).length===0){setIntErr(true);setAvail({});}else setAvail(d); }
+    catch{ setIntErr(true); setAvail({}); }
+    finally{ setLoadingInt(false); }
+  };
+  const getLoc = () => {
+    if(!navigator.geolocation){alert('Geolocation not supported');return;}
+    navigator.geolocation.getCurrentPosition(
+      pos=>{ setForm({...form,latitude:pos.coords.latitude.toString(),longitude:pos.coords.longitude.toString()}); setMsgP({t:'ok',s:`📍 Location set!`}); },
+      err=>{ const m={1:'Permission denied.',2:'Unavailable.',3:'Timed out.'}; setMsgP({t:'err',s:m[err.code]||'Unknown error.'}); },
+      {enableHighAccuracy:true,timeout:10000,maximumAge:0}
+    );
+  };
+  const saveProfile = async (e) => {
+    e.preventDefault(); setSavingP(true); setMsgP(null);
+    try {
+      const d={};
+      if(form.name?.trim()) d.name=form.name.trim();
+      if(form.bio!==null&&form.bio!==undefined) d.bio=form.bio.trim();
+      if(form.latitude) d.latitude=parseFloat(form.latitude);
+      if(form.longitude) d.longitude=parseFloat(form.longitude);
+      await api.updateProfile(token,d); await loadProfile(); setEditing(false); setMsgP({t:'ok',s:'✓ Profile updated!'});
+    } catch(e){ setMsgP({t:'err',s:'Failed: '+e.message}); }
+    finally{ setSavingP(false); }
+  };
+  const saveInterests = async () => {
+    if(sel.length<1||sel.length>10){setMsgI({t:'err',s:'Select 1–10 interests'});return;}
+    setSavingI(true); setMsgI(null);
+    try { await api.updateInterests(token,sel); await loadProfile(); setMsgI({t:'ok',s:'✓ Interests saved!'}); }
+    catch(e){ setMsgI({t:'err',s:'Failed: '+e.message}); }
+    finally{ setSavingI(false); }
+  };
+  const toggleInt = (id) => {
+    if(sel.includes(id)) setSel(sel.filter(i=>i!==id));
+    else { if(sel.length>=10){setMsgI({t:'err',s:'Max 10 interests'});return;} setSel([...sel,id]); }
+  };
+
+  if(loading) return <LoadScreen text="Loading profile"/>;
+
+  return (
+    <div className="pg fade-up">
+      {/* Profile Card */}
+      <div className="glass" style={{borderRadius:'var(--r2)',overflow:'hidden'}}>
+        <div className="profile-hero">
+          <Ava name={profile.name} size="xl" ring/>
+          <div className="ph-info">
+            <div className="ph-name">{profile.name}</div>
+            <div className="ph-email">{profile.email}</div>
+            <div className="ph-stats">
+              <span className="ph-stat"><span>👥</span>{profile.friend_count} friends</span>
+              {profile.interests&&<span className="ph-stat"><span>✨</span>{profile.interests.length} interests</span>}
+              {profile.latitude&&profile.longitude&&<span className="ph-stat"><span>📍</span>Location set</span>}
+            </div>
+          </div>
+          <button className={`btn btn-sm ph-edit-btn ${editing?'btn-glass':'btn-outline'}`} onClick={()=>{setEditing(!editing);setMsgP(null);}}>
+            {editing?'✕ Cancel':'✏ Edit Profile'}
+          </button>
+        </div>
+
+        <div className="profile-body">
+          {msgP && <div className={`alert ${msgP.t==='ok'?'alert-ok':'alert-err'} mb-4`}>{msgP.s}</div>}
+          {editing ? (
+            <form onSubmit={saveProfile} style={{display:'flex',flexDirection:'column',gap:'16px'}}>
+              <div><label className="lbl">Name</label><input className="inp" type="text" value={form.name} placeholder="Your name" onChange={e=>setForm({...form,name:e.target.value})}/></div>
+              <div><label className="lbl">Bio</label><textarea className="inp" rows="3" value={form.bio} placeholder="Tell people about yourself…" onChange={e=>setForm({...form,bio:e.target.value})}/>
+                <div style={{fontSize:'12px',color:'var(--text3)',marginTop:'4px'}}>Max 500 characters</div>
+              </div>
+              <div>
+                <label className="lbl">Location</label>
+                <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(120px,1fr))',gap:'12px',marginBottom:'10px'}}>
+                  <input className="inp" type="number" step="any" value={form.latitude}  placeholder="Latitude"  onChange={e=>setForm({...form,latitude:e.target.value})}/>
+                  <input className="inp" type="number" step="any" value={form.longitude} placeholder="Longitude" onChange={e=>setForm({...form,longitude:e.target.value})}/>
+                </div>
+                <button type="button" className="btn btn-glass btn-sm" onClick={getLoc}>📍 Detect My Location</button>
+              </div>
+              <button type="submit" className="btn btn-grad" disabled={savingP} style={{alignSelf:'flex-start',minWidth:'160px'}}>
+                {savingP?<><Spinner sm/> Saving…</>:'Save Changes'}
+              </button>
+            </form>
+          ) : (
+            <div>
+              {profile.bio && <div style={{marginBottom:'14px'}}><div className="section-label">About</div><p style={{fontSize:'14px',color:'var(--text2)',lineHeight:'1.65'}}>{profile.bio}</p></div>}
+              {profile.latitude&&profile.longitude && <div><div className="section-label">Location</div><p style={{fontSize:'13px',color:'var(--text3)'}}>📍 {profile.latitude.toFixed(4)}, {profile.longitude.toFixed(4)}</p></div>}
+              {!profile.bio&&!profile.latitude && <p style={{fontSize:'14px',color:'var(--text3)'}}>No details yet — click Edit to fill in your bio and location.</p>}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Interests Card */}
+      <div className="glass interests-card" style={{borderRadius:'var(--r2)'}}>
+        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'16px'}}>
+          <h2 style={{fontSize:'22px',fontWeight:'900'}}>Your Interests</h2>
+          <div className="int-counter">✦ {sel.length} / 10</div>
+        </div>
+
+        {profile.interests.length>0 && (
+          <div className="tags-row mb-4">
+            {profile.interests.map(i=><span key={i.id} className="tag">{i.icon} {i.name}</span>)}
+          </div>
+        )}
+
+        <div className="div mb-4" style={{margin:'16px 0'}}/>
+
+        <div style={{fontSize:'14px',fontWeight:'700',marginBottom:'16px',color:'var(--text2)'}}>Select Interests</div>
+        {msgI && <div className={`alert ${msgI.t==='ok'?'alert-ok':'alert-err'} mb-4`}>{msgI.s}</div>}
+
+        {loadingInt ? (
+          <div style={{display:'flex',justifyContent:'center',padding:'40px 0'}}><Spinner/></div>
+        ) : intErr||Object.keys(avail).length===0 ? (
+          <div className="no-int-box">
+            <div style={{fontSize:'32px',marginBottom:'8px'}}>⚠️</div>
+            <h4>No Interests Available</h4>
+            <p>Run the populate script to add interests:</p>
+            <div className="code-blk">python populateInterest.py</div>
+            <button className="btn btn-grad btn-sm mt-3" onClick={loadInterests}>🔄 Retry</button>
+          </div>
+        ) : (
+          <>
+            {Object.entries(avail).map(([cat,ints])=>(
+              <div key={cat} className="cat-sec">
+                <div className="cat-title">{cat}</div>
+                <div className="tags-row">
+                  {ints.map(i=>(
+                    <button key={i.id} type="button" className={`tag-sel tag${sel.includes(i.id)?' on':''}`} onClick={()=>toggleInt(i.id)}>
+                      {i.icon} {i.name}{sel.includes(i.id)&&' ✓'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+            <button className="btn btn-grad mt-3" onClick={saveInterests}
+              disabled={sel.length<1||sel.length>10||savingI} style={{minWidth:'160px',maxWidth:'100%'}}>
+              {savingI?<><Spinner sm/> Saving…</>:`Save Interests (${sel.length} selected)`}
+            </button>
+            {sel.length>10 && <p style={{fontSize:'12px',color:'#f87171',marginTop:'6px'}}>⚠️ Max 10 interests allowed</p>}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────── APP SHELL ─────────────────────────── */
+function App() {
+  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [user, setUser] = useState(null);
+  const [page, setPage] = useState('matches');
+  const [booting, setBooting] = useState(true);
+
+  useEffect(()=>{ token ? loadUser() : setBooting(false); },[token]);
+
+  const loadUser = async () => {
+    try { const u=await api.getCurrentUser(token); setUser(u); }
+    catch { localStorage.removeItem('token'); setToken(null); }
+    finally { setBooting(false); }
+  };
+
+  const login  = (t) => setToken(t);
+  const logout = () => { localStorage.removeItem('token'); setToken(null); setUser(null); };
+
+  if(booting) return (
+    <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',background:'var(--bg)'}}>
+      <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:'16px'}}>
+        <div style={{fontFamily:"'Fraunces',serif",fontSize:'36px',fontWeight:'900',fontStyle:'italic',background:'var(--grad)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>MeetZy</div>
+        <Spinner/>
+      </div>
+    </div>
+  );
+  if(!token) return <Auth onLogin={login}/>;
+
+  const navItems = [
+    {id:'matches', icon:'✦', label:'Discover'},
+    {id:'friends', icon:'👥', label:'Friends'},
+    {id:'chat',    icon:'💬', label:'Chat'},
+    {id:'profile', icon:'👤', label:'Profile'},
+  ];
+
+  return (
+    <>
+      {/* Orbs are outside app shell so they persist */}
+      <div className="app-shell">
+        {/* Desktop Nav */}
+        <nav className="nav">
+          <div className="nav-inner">
+            <div className="nav-logo">MeetZy</div>
+            <div className="nav-links">
+              {navItems.map(n=>(
+                <button key={n.id} className={`nav-btn${page===n.id?' active':''}`} onClick={()=>setPage(n.id)}>
+                  <span className="ni">{n.icon}</span>{n.label}
+                </button>
+              ))}
+            </div>
+            <div className="nav-right">
+              <div className="nav-chip">
+                <Ava name={user?.name} size="sm"/>
+                <span className="nav-chip-name">{user?.name}</span>
+              </div>
+              <button className="btn btn-glass btn-sm" onClick={logout}>Sign out</button>
+            </div>
+          </div>
+        </nav>
+
+        {/* Mobile top bar */}
+        <div className="mob-top">
+          <span className="mob-top-logo">MeetZy</span>
+          <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+            <Ava name={user?.name} size="sm"/>
+            <button className="btn btn-glass btn-sm" onClick={logout}>Out</button>
+          </div>
+        </div>
+
+        {/* Page content */}
+        <div className="page-wrap">
+          {page==='matches' && <FindMatches token={token}/>}
+          {page==='friends' && <Friends     token={token}/>}
+          {page==='chat'    && <Chat        token={token} currentUserId={user?.id}/>}
+          {page==='profile' && <Profile     token={token} user={user}/>}
+        </div>
+
+        {/* Mobile bottom nav */}
+        <nav className="mob-nav">
+          <div className="mob-nav-inner">
+            {navItems.map(n=>(
+              <button key={n.id} className={`mob-item${page===n.id?' active':''}`} onClick={()=>setPage(n.id)}>
+                <span className="mi">{n.icon}</span>
+                <span className="ml">{n.label}</span>
+              </button>
+            ))}
+          </div>
+        </nav>
+      </div>
+    </>
+  );
+}
+
+ReactDOM.render(<App/>, document.getElementById('root'));
+</script>
+</body>
+</html>
